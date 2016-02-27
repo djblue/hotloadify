@@ -1,6 +1,6 @@
 {
   "name": "hotloadify",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Thin wrapper around LiveReactload with less config.",
   "bin": {
     "hotloadify": "hotloadify"
