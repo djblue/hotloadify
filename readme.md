@@ -11,11 +11,11 @@ basic `index.html` to bootstrap development with less configuration.
 
 To start `hotloadify`, do:
 
-    hotloadify [options] main.js
+    hotloadify main.js [options]
 
 or to also open a browser window, do:
 
-    hotloadify --open main.js
+    hotloadify main.js --open
 
 ## options
 
