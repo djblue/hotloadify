@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+
+var browserify = require('browserify')
+var watchify = require('watchify')
+var livereactload = require('livereactload')
+var http = require('http')
+var fs = require('fs')
+var devnull = require('dev-null')
+var argv = require('minimist')(process.argv.slice(2))
+var path = require('path')
+var open = require('open')
+
+var bundlePath = argv.bundle || '/bundle.js'
+var indexPath = argv.index || path.resolve(__dirname, 'index.html')
+var port = process.env.PORT || argv.port || 3000
+
+// TODO: figure out how to pass argv options to browserify
+var b = function (entry) {
+  return browserify({
+    entries: [ entry ],
+    plugin: [ livereactload ],
+    debug: true,
+    cache: {},
+    packageCache: {}
+  })
+}
+
+var watcher = watchify(b(argv._[0]))
+
+watcher.on('update', function () {
+  // rebuild bundle but don't save it anywhere, this is 
+  // needed so the livereactload will push updates to client
+  watcher.bundle().pipe(devnull())
+})
+
+http.createServer(function (req, res) {
+  if (req.url === bundlePath) {
+    watcher.bundle().pipe(res)
+  } else {
+    fs.createReadStream(indexPath).pipe(res)
+  }
+}).listen(port, function () {
+  if (argv.open) {
+    open('http://localhost:' + port)
+  }
+})
