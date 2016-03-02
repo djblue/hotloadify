@@ -2,6 +2,7 @@
 
 var browserify = require('browserify')
 var watchify = require('watchify')
+var errorify = require('errorify')
 var livereactload = require('livereactload')
 var http = require('http')
 var fs = require('fs')
@@ -18,7 +19,7 @@ var port = process.env.PORT || argv.port || 3000
 var b = function (entry) {
   return browserify({
     entries: [ entry ],
-    plugin: [ livereactload ],
+    plugin: [ livereactload, errorify ],
     debug: true,
     cache: {},
     packageCache: {}
