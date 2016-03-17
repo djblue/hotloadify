@@ -24,6 +24,7 @@ respective defaults.
 
 - bundle - specify the bundle path for server (/bundle.js)
 - index - specify the file path be served as index.html (__dirname/index.html)
+- proxy - proxy all other requests to this address (ex: http://localhost:4000)
 - port - port the server should listen on (3000)
 - open - open browser to dev page (false)
 

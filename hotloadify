@@ -5,11 +5,13 @@ var watchify = require('watchify')
 var errorify = require('errorify')
 var livereactload = require('livereactload')
 var http = require('http')
+var proxy = require('http-proxy').createProxyServer()
 var fs = require('fs')
 var devnull = require('dev-null')
 var argv = require('minimist')(process.argv.slice(2))
 var path = require('path')
 var open = require('open')
+
 
 var bundlePath = argv.bundle || '/bundle.js'
 var indexPath = argv.index || path.resolve(__dirname, 'index.html')
@@ -41,8 +43,16 @@ watcher.on('update', function () {
 http.createServer(function (req, res) {
   if (req.url === bundlePath) {
     watcher.bundle().pipe(res)
-  } else {
+  } else if (req.url === '/') {
     fs.createReadStream(indexPath).pipe(res)
+  } else if (argv.proxy) {
+    proxy.web(req, res, {
+      target: argv.proxy,
+      secure: false // because it's dev
+    })
+  } else {
+    res.writeHead(404)
+    res.end()
   }
 }).listen(port, function () {
   if (argv.open) {
