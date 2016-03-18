@@ -12,7 +12,6 @@ var argv = require('minimist')(process.argv.slice(2))
 var path = require('path')
 var open = require('open')
 
-
 var bundlePath = argv.bundle || '/bundle.js'
 var indexPath = argv.index || path.resolve(__dirname, 'index.html')
 var port = process.env.PORT || argv.port || 3000
@@ -35,7 +34,7 @@ var b = function (entry) {
 var watcher = watchify(b(argv._[0]))
 
 watcher.on('update', function () {
-  // rebuild bundle but don't save it anywhere, this is 
+  // rebuild bundle but don't save it anywhere, this is
   // needed so the livereactload will push updates to client
   watcher.bundle().pipe(devnull())
 })
