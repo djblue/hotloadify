@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 var browserify = require('browserify')
 var watchify = require('watchify')
 var errorify = require('errorify')
@@ -7,54 +5,52 @@ var livereactload = require('livereactload')
 var http = require('http')
 var proxy = require('http-proxy').createProxyServer()
 var fs = require('fs')
-var devnull = require('dev-null')
-var argv = require('minimist')(process.argv.slice(2))
 var path = require('path')
-var open = require('open')
+var devnull = require('dev-null')
 
-var bundlePath = argv.bundle || '/bundle.js'
-var indexPath = argv.index || path.resolve(__dirname, 'index.html')
-var port = process.env.PORT || argv.port || 3000
+module.exports = function (main, opts, cb) {
+  var done = cb || function () {}
 
-// TODO: figure out how to pass argv options to browserify
-var b = function (entry) {
-  return browserify({
-    entries: [ entry ],
-    plugin: [ livereactload, errorify ],
-    debug: true,
-    cache: {},
-    packageCache: {},
-    // If hotloadify is installed globally, browserify can't find
-    // livereactload/client. By adding the local node_modules to the
-    // paths, we enable browserify to find the client.
-    paths: ['./node_modules', path.join(__dirname, 'node_modules')]
+  // TODO: figure out how to pass opts options to browserify
+  var b = function (entry) {
+    return browserify({
+      entries: [ entry ],
+      plugin: [ livereactload, errorify ],
+      debug: true,
+      cache: {},
+      packageCache: {},
+      // If hotloadify is installed globally, browserify can't find
+      // livereactload/client. By adding the local node_modules to the
+      // paths, we enable browserify to find the client.
+      paths: ['./node_modules', path.join(__dirname, 'node_modules')]
+    })
+  }
+
+  var watcher = watchify(b(main))
+
+  watcher.on('update', function () {
+    // rebuild bundle but don't save it anywhere, this is
+    // needed so the livereactload will push updates to client
+    watcher.bundle().pipe(devnull())
+  })
+
+  var server = http.createServer(function (req, res) {
+    if (req.url === opts.bundle) {
+      watcher.bundle().pipe(res)
+    } else if (req.url === '/') {
+      fs.createReadStream(opts.index).pipe(res)
+    } else if (opts.proxy) {
+      proxy.web(req, res, {
+        target: opts.proxy,
+        secure: false // because it's dev
+      })
+    } else {
+      res.writeHead(404)
+      res.end()
+    }
+  })
+
+  server.listen(opts.port, function () {
+    done(null, server.address())
   })
 }
-
-var watcher = watchify(b(argv._[0]))
-
-watcher.on('update', function () {
-  // rebuild bundle but don't save it anywhere, this is
-  // needed so the livereactload will push updates to client
-  watcher.bundle().pipe(devnull())
-})
-
-http.createServer(function (req, res) {
-  if (req.url === bundlePath) {
-    watcher.bundle().pipe(res)
-  } else if (req.url === '/') {
-    fs.createReadStream(indexPath).pipe(res)
-  } else if (argv.proxy) {
-    proxy.web(req, res, {
-      target: argv.proxy,
-      secure: false // because it's dev
-    })
-  } else {
-    res.writeHead(404)
-    res.end()
-  }
-}).listen(port, function () {
-  if (argv.open) {
-    open('http://localhost:' + port)
-  }
-})

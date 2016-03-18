@@ -3,7 +3,7 @@
   "version": "0.0.5",
   "description": "Thin wrapper around LiveReactload with less config.",
   "bin": {
-    "hotloadify": "hotloadify.js"
+    "hotloadify": "bin.js"
   },
   "keywords": [
     "react",
