@@ -25,7 +25,7 @@ module.exports = function (main, opts, cb) {
       debug: true,
       cache: {},
       packageCache: {},
-      // If hotloadify is installed globally, browserify can't find
+      // If hotreloadify is installed globally, browserify can't find
       // livereactload/client. By adding the local node_modules to the
       // paths, we enable browserify to find the client.
       paths: ['./node_modules', path.join(__dirname, 'node_modules')]

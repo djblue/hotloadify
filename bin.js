@@ -4,7 +4,7 @@ var open = require('open')
 var path = require('path')
 var argv = require('minimist')(process.argv.slice(2))
 
-var hotloadify = require('./hotloadify')
+var hotreloadify = require('./hotreloadify')
 
 var main = argv._[0]
 
@@ -20,7 +20,7 @@ var opts = {
   proxy: argv.proxy
 }
 
-hotloadify(main, opts, function (err, addr) {
+hotreloadify(main, opts, function (err, addr) {
   if (err) {
     console.error(err)
   } else if (argv.open) {

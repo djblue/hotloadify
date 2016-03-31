@@ -1,25 +1,25 @@
-# hotloadify
+# hotreloadify
 
 A thin wrapper around `livereactload`. It adds on an http server and a
 basic `index.html` to bootstrap development with less configuration.
 
 ## install
 
-    npm i --save-dev hotloadify
+    npm i --save-dev hotreloadify
 
 ## usage
 
-To start `hotloadify`, do:
+To start `hotreloadify`, do:
 
-    hotloadify main.js [options]
+    hotreloadify main.js [options]
 
 or to also open a browser window, do:
 
-    hotloadify main.js --open
+    hotreloadify main.js --open
 
 ## options
 
-The following are the list of options taken by `hotloadify` and their
+The following are the list of options taken by `hotreloadify` and their
 respective defaults.
 
 - bundle - specify the bundle path for server (/bundle.js)
