@@ -3,13 +3,19 @@ var watchify = require('watchify')
 var errorify = require('errorify')
 var livereactload = require('livereactload')
 var http = require('http')
-var proxy = require('http-proxy').createProxyServer()
+var httpProxy = require('http-proxy')
 var fs = require('fs')
 var path = require('path')
 var devnull = require('dev-null')
 
 module.exports = function (main, opts, cb) {
   var done = cb || function () {}
+
+  var proxy = httpProxy.createProxyServer()
+
+  proxy.on('error', function (e) {
+    console.error('http-proxy:', JSON.stringify(e))
+  })
 
   // TODO: figure out how to pass opts options to browserify
   var b = function (entry) {
